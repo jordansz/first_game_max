@@ -9,7 +9,7 @@ import sys
 
 print("here!")
 server_ip = socket.gethostname()  
-port = 5550  
+port = 5551  
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("after socket()")

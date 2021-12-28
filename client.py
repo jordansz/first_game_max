@@ -22,50 +22,26 @@ pygame.init()
 width = 1482
 height = 915
 win = pygame.display.set_mode((width, height))
-bg = pygame.image.load('assets/background.png').convert()
+bg = pygame.image.load('assets/game_background.png').convert()
+bg = pygame.transform.scale(bg, (1482, 915))
 pygame.display.set_caption("T")
 
-#erik walking pics
-e_standing = pygame.image.load('assets/Estanding.png').convert_alpha()
-e_standing = pygame.transform.scale(e_standing, (120, 120))
-e_right = [pygame.image.load('assets/ER1.png').convert_alpha(), pygame.image.load('assets/ER2.png').convert_alpha(), pygame.image.load('assets/ER3.png').convert_alpha(),
-            pygame.image.load('assets/ER4.png').convert_alpha(), pygame.image.load('assets/ER5.png').convert_alpha(), pygame.image.load('assets/ER6.png').convert_alpha(),
-            pygame.image.load('assets/ER7.png').convert_alpha(), pygame.image.load('assets/ER8.png').convert_alpha(), pygame.image.load('assets/ER9.png').convert_alpha()]
+entity_standing = pygame.image.load('assets/standing.png')
+entity_walking_left = [pygame.image.load('assets/L1.png').convert_alpha(), pygame.image.load('assets/L2.png').convert_alpha(), pygame.image.load('assets/L3.png').convert_alpha(),
+            pygame.image.load('assets/L4.png').convert_alpha(), pygame.image.load('assets/L5.png').convert_alpha(), pygame.image.load('assets/L6.png').convert_alpha(),
+            pygame.image.load('assets/L7.png').convert_alpha(), pygame.image.load('assets/L8.png').convert_alpha(), pygame.image.load('assets/L9.png').convert_alpha()]
 
-e_left = [pygame.image.load('assets/EL1.png').convert_alpha(), pygame.image.load('assets/EL2.png').convert_alpha(), pygame.image.load('assets/EL3.png').convert_alpha(),
-            pygame.image.load('assets/EL4.png').convert_alpha(), pygame.image.load('assets/EL5.png').convert_alpha(), pygame.image.load('assets/EL6.png').convert_alpha(),
-            pygame.image.load('assets/EL7.png').convert_alpha(), pygame.image.load('assets/EL8.png').convert_alpha(), pygame.image.load('assets/EL9.png').convert_alpha()]
+entity_walking_right = [pygame.Surface] * 9       #same size list as walking left list
+# print(type(entity_walking_right))
 
-#jordan walking pics
-j_standing = pygame.image.load('assets/Jstanding.png').convert_alpha()
-j_standing = pygame.transform.scale(j_standing, (120, 120))
-j_right = [pygame.image.load('assets/JR1.png').convert_alpha(), pygame.image.load('assets/JR2.png').convert_alpha(), pygame.image.load('assets/JR3.png').convert_alpha(),
-            pygame.image.load('assets/JR4.png').convert_alpha(), pygame.image.load('assets/JR5.png').convert_alpha(), pygame.image.load('assets/JR6.png').convert_alpha(),
-            pygame.image.load('assets/JR7.png').convert_alpha(), pygame.image.load('assets/JR8.png').convert_alpha(), pygame.image.load('assets/JR9.png').convert_alpha()]
-
-j_left = [pygame.image.load('assets/JL1.png').convert_alpha(), pygame.image.load('assets/JL2.png').convert_alpha(), pygame.image.load('assets/JL3.png').convert_alpha(),
-            pygame.image.load('assets/JL4.png').convert_alpha(), pygame.image.load('assets/JL5.png').convert_alpha(), pygame.image.load('assets/JL6.png').convert_alpha(),
-            pygame.image.load('assets/JL7.png').convert_alpha(), pygame.image.load('assets/JL8.png').convert_alpha(), pygame.image.load('assets/JL9.png').convert_alpha()]
-
-#max walking stuff
-standing = pygame.image.load('assets/Mstanding.png')
-mwalkLeft = [pygame.image.load('assets/ML1.png').convert_alpha(), pygame.image.load('assets/ML2.png').convert_alpha(), pygame.image.load('assets/ML3.png').convert_alpha(),
-            pygame.image.load('assets/ML4.png').convert_alpha(), pygame.image.load('assets/ML5.png').convert_alpha(), pygame.image.load('assets/ML6.png').convert_alpha(),
-            pygame.image.load('assets/ML7.png').convert_alpha(), pygame.image.load('assets/ML8.png').convert_alpha(), pygame.image.load('assets/ML9.png').convert_alpha()]
-
-mwalkRight = [pygame.image.load('assets/MR1.png').convert_alpha(), pygame.image.load('assets/MR2.png').convert_alpha(), pygame.image.load('assets/MR3.png').convert_alpha(),
-            pygame.image.load('assets/MR4.png').convert_alpha(), pygame.image.load('assets/MR5.png').convert_alpha(), pygame.image.load('assets/MR6.png').convert_alpha(),
-            pygame.image.load('assets/MR7.png').convert_alpha(), pygame.image.load('assets/MR8.png').convert_alpha(), pygame.image.load('assets/MR9.png').convert_alpha()]
-
+# Must change some of the images to be properly laid out and the correct size
+entity_standing = pygame.transform.scale(entity_standing, (120, 120))
 i = 0
 while i < 9:
-    mwalkLeft[i] = pygame.transform.scale(mwalkLeft[i], (120, 120))
-    mwalkRight[i] = pygame.transform.scale(mwalkRight[i], (120, 120))
-    j_right[i]  = pygame.transform.scale(j_right[i], (120, 120))
-    j_left[i]   = pygame.transform.scale(j_left[i], (120, 120))
-    e_right[i]  = pygame.transform.scale(e_right[i], (120, 120))
-    e_left[i]   = pygame.transform.scale(e_left[i], (120, 120))
+    entity_walking_left[i] = pygame.transform.scale(entity_walking_left[i], (120, 120))
+    entity_walking_right[i] = pygame.transform.flip(entity_walking_left[i], True, False)
     i += 1
+
 
 # dropping stuff
 cannon = pygame.image.load('assets/cannon.png').convert_alpha()
@@ -102,8 +78,8 @@ pygame.mixer.init()
 
 
 #max's pic
-max = pygame.image.load('assets/max.png').convert_alpha()
-max = pygame.transform.scale(max, (98, 213))
+# max = pygame.image.load('assets/max.png').convert_alpha()
+# max = pygame.transform.scale(max, (98, 213))
 
 # why can't i put "text font stuff" here?
 chat_box = pygame.Rect(10, height - 44, 273, 34)
@@ -139,7 +115,7 @@ def display_score(p, p2, win):
 
 
 def redraw_window(win, player, player2, mouse_pos, text, bomb1, bomb2, cannon1, cannon2):
-    win.blit(bg, (0,0))
+    win.blit(bg, (0, 0))
     display_score(player, player2, win)
     draw_player(player)
     draw_player(player2)
@@ -251,17 +227,17 @@ def winner(win, p, p2, n, winner):
 def draw_player(p):
     x, y, left, right, index, id = p.get_draw_specs()
     if left and not right and id == 0:
-        win.blit(j_left[index], (x, y))
+        win.blit(entity_walking_left[index], (x, y))
     elif not left and right and id == 0:
-        win.blit(j_right[index], (x, y))
+        win.blit(entity_walking_right[index], (x, y))
     elif not left and not right and id == 0:
-        win.blit(j_standing, (x, y))
+        win.blit(entity_standing, (x, y))
     elif left and not right and id == 1:
-        win.blit(e_left[index], (x, y))
+        win.blit(entity_walking_left[index], (x, y))
     elif not left and right and id == 1:
-        win.blit(e_right[index], (x, y))
+        win.blit(entity_walking_right[index], (x, y))
     else:
-        win.blit(e_standing, (x, y))
+        win.blit(entity_standing, (x, y))
 
 def display_intro_text(p, p2, win):
     win.blit(intro_text, (((width // 2) - (intro_text.get_width() //2)), 10))
@@ -290,7 +266,7 @@ def intro():
                     p.set_on(True)
 
 
-        win.blit(bg, (0,0))
+        win.blit(bg, (0, 0))
         draw_player(p)
         draw_player(p2)
         display_intro_text(p, p2, win)
@@ -423,30 +399,30 @@ def main(p, p2, n):
 
         mwalk_count += 1
         if m_right and frame_walk < width - 100:            #frame_walk used to figure out x pos
-            win.blit(mwalkRight[mwalk_count // 3], (frame_walk, 740))
+            win.blit(entity_walking_right[mwalk_count // 3], (frame_walk, 740))
             max_stat = 0
             frame_walk += 8
         elif m_right and frame_walk >= width - 900:                     #why does 900 work??? to tired now, figure out later
-            win.blit(mwalkRight[mwalk_count // 3], (frame_walk, 740))
+            win.blit(entity_walking_right[mwalk_count // 3], (frame_walk, 740))
             max_stat = 0
             m_right = False
             m_left = True
             frame_walk -= 8
         elif m_left and frame_walk > 20:
-            win.blit(mwalkLeft[mwalk_count // 3], (frame_walk, 740))
+            win.blit(entity_walking_left[mwalk_count // 3], (frame_walk, 740))
             max_stat = 1
             frame_walk -= 8
         else:
-            win.blit(mwalkLeft[mwalk_count // 3], (frame_walk, 740))
+            win.blit(entity_walking_left[mwalk_count // 3], (frame_walk, 740))
             max_stat = 1
             m_left = False
             m_right = True
             frame_walk += 8
 
         if max_stat == 0:            # find better way to do this
-            collision(mwalkLeft[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
+            collision(entity_walking_left[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
         else:
-            collision(mwalkRight[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
+            collision(entity_walking_right[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
 
         pygame.display.update()
 
