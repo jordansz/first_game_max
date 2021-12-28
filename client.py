@@ -338,7 +338,6 @@ def main(p, p2, n):
         # there has to be a better way to check scores???!!
 
         for event in pygame.event.get():
-            # print("there")
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
