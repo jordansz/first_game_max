@@ -4,6 +4,10 @@
 # window size might be to big for smaller screens.
 # winning screen 
 
+# Client class holds the games logic, bringing together the multiplayer game
+# For it to work both clients (players essentially) run this script after starting 
+# the server, images are loaded in, set to desired size attributes and the game begins
+
 import pygame
 import math
 from network import Network
@@ -17,7 +21,8 @@ from noise_player import *
 import random
 
 
-#basic pop up window stuff
+#basic pop up window stuff, size of the screen and initialization of pygame module
+
 pygame.init()
 width = 1482
 height = 915
@@ -26,15 +31,19 @@ bg = pygame.image.load('assets/game_background.png').convert()
 bg = pygame.transform.scale(bg, (1482, 915))
 pygame.display.set_caption("T")
 
+
+# start to load in all the images
+
 entity_standing = pygame.image.load('assets/standing.png')
 entity_walking_left = [pygame.image.load('assets/L1.png').convert_alpha(), pygame.image.load('assets/L2.png').convert_alpha(), pygame.image.load('assets/L3.png').convert_alpha(),
             pygame.image.load('assets/L4.png').convert_alpha(), pygame.image.load('assets/L5.png').convert_alpha(), pygame.image.load('assets/L6.png').convert_alpha(),
             pygame.image.load('assets/L7.png').convert_alpha(), pygame.image.load('assets/L8.png').convert_alpha(), pygame.image.load('assets/L9.png').convert_alpha()]
 
 entity_walking_right = [pygame.Surface] * 9       #same size list as walking left list
-# print(type(entity_walking_right))
+
 
 # Must change some of the images to be properly laid out and the correct size
+
 entity_standing = pygame.transform.scale(entity_standing, (120, 120))
 i = 0
 while i < 9:
@@ -43,7 +52,8 @@ while i < 9:
     i += 1
 
 
-# dropping stuff
+# loading in the dropping asset images
+
 cannon = pygame.image.load('assets/cannon.png').convert_alpha()
 cannon = pygame.transform.scale(cannon, (150, 244))
 cannonL = pygame.transform.flip(cannon, True, False)
@@ -77,11 +87,7 @@ pygame.mixer.init()
 # pygame.time.set_timer(RANDNOISE, 10000)  #random noise every 8 seconds
 
 
-#max's pic
-# max = pygame.image.load('assets/max.png').convert_alpha()
-# max = pygame.transform.scale(max, (98, 213))
-
-# why can't i put "text font stuff" here?
+# Setting up the fonts to be rendered to certain text aswell as declaring the chat box
 chat_box = pygame.Rect(10, height - 44, 273, 34)
 p1_font = pygame.font.Font(pygame.font.get_default_font(), 40)
 p2_font = pygame.font.Font(pygame.font.get_default_font(), 40)
@@ -107,12 +113,19 @@ def check_cooldown(x, y):
         x = 0
     return x
 
+
+# At the top of the screen both players scores will be displayed with this function
+
 def display_score(p, p2, win):
     p1_score = p1_font.render(f"Player 1 score: {p.get_score()}", True, (0, 0, 0))
     p2_score = p2_font.render(f"Player 2 score: {p2.get_score()}", True, (0, 0, 0))
     win.blit(p1_score, (20, 20))
     win.blit(p2_score, (width - 350, 20))
 
+
+
+# This function is used to redraw the game screen each frame.
+# It utilizes multiple other display functions from different classes.
 
 def redraw_window(win, player, player2, mouse_pos, text, bomb1, bomb2, cannon1, cannon2):
     win.blit(bg, (0, 0))
@@ -137,8 +150,9 @@ def redraw_window(win, player, player2, mouse_pos, text, bomb1, bomb2, cannon1, 
        cannon2.draw(win)
 
 
+# Collision checking between falling assets and the ai is done here
+# I need to fix this and add a basic ai class, possibly a seperate or child class to player
 
-# fix later if i actually make proper classes
 def collision(max_img, max_x, max_y, bomb1, bomb2, cannon1, cannon2, p, p2):
     max_mask = pygame.mask.from_surface(max_img)
     bomb1_mask = bomb1.get_mask()
@@ -171,6 +185,7 @@ def collision(max_img, max_x, max_y, bomb1, bomb2, cannon1, cannon2, p, p2):
             p2.increase_score(2)
 
 
+# If a player types text it is played using this function
 
 def play_text(p1, p2):                  #may cause problems if both clients taunt at the same time
     text1 = p1.get_text()
@@ -183,6 +198,10 @@ def play_text(p1, p2):                  #may cause problems if both clients taun
         start_new_thread(ts.play_mp3, (text2, 2))
         p2.set_text("")
         os.remove("taunt2.mp3")
+
+
+# Once there is a winner, all of the player attributes are set back to default, and a little bit of 
+# text is displayed who won or lost on either players screen
 
 def winner(win, p, p2, n, winner):
     p.revert()
@@ -220,9 +239,14 @@ def winner(win, p, p2, n, winner):
                     p.set_on(True)
                     print()
         if p.get_on() and p2.get_on():
-            print("here starting again")
+            # print("here starting again")
             run = False
             main(p, p2, n)
+
+
+# draw_player draws each given players image
+# To achieve this the players basic attributes, direction (left, right) and current possition
+# aswell as the player id, to correctly draw a player
 
 def draw_player(p):
     x, y, left, right, index, id = p.get_draw_specs()
@@ -239,6 +263,10 @@ def draw_player(p):
     else:
         win.blit(entity_standing, (x, y))
 
+
+# At the start of the game this function will display the rules and
+# the status of which players are ready or not
+
 def display_intro_text(p, p2, win):
     win.blit(intro_text, (((width // 2) - (intro_text.get_width() //2)), 10))
     win.blit(controls1_text, (((width // 2) - (controls1_text.get_width() // 2)), 200))
@@ -249,6 +277,9 @@ def display_intro_text(p, p2, win):
         win.blit(wait_p2, (((width // 2) - (wait_p2.get_width() // 2)), 50))
     elif not p.get_on() and p2.get_on():
         win.blit(wait_p, (((width // 2) - (wait_p.get_width() // 2)), 50))
+
+
+# intro before main game loop to display the wanted graphics, aswell as sets up the Network for communication
 
 def intro():
     n = Network()
@@ -276,6 +307,9 @@ def intro():
             main(p, p2, n)
     pygame.quit()
 
+
+# main starts all the games initial rules and player setup,
+# once thats done the main game loop takes place and the game begins
 
 def main(p, p2, n): 
     p2.set_win_status(False)       
@@ -383,6 +417,9 @@ def main(p, p2, n):
                 cannon2.set_angle(-1 * angle)
 
 
+
+        # to ensure theres no spam dropping stuff these are placed here
+        
         s1_cd = check_cooldown(s1_cd, 53)
         s2_cd = check_cooldown(s2_cd, 53)
         n1_cd = check_cooldown(n1_cd, 80)
@@ -398,7 +435,7 @@ def main(p, p2, n):
             mwalk_count = 0
 
         mwalk_count += 1
-        if m_right and frame_walk < width - 100:            #frame_walk used to figure out x pos
+        if m_right and frame_walk < width - 100:            #frame_walk is used to figure out x pos
             win.blit(entity_walking_right[mwalk_count // 3], (frame_walk, 740))
             max_stat = 0
             frame_walk += 8
@@ -419,7 +456,7 @@ def main(p, p2, n):
             m_right = True
             frame_walk += 8
 
-        if max_stat == 0:            # find better way to do this
+        if max_stat == 0:            # jordan find a better way to do this
             collision(entity_walking_left[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
         else:
             collision(entity_walking_right[mwalk_count // 3], frame_walk, 740, bomb1, bomb2, cannon1, cannon2, p, p2)
@@ -454,5 +491,8 @@ def main(p, p2, n):
             p2.set_on(False)
             winner(win, p, p2, n, 0)
             return
+
+
+# intro leads to the start of the initial lobby
 
 intro()

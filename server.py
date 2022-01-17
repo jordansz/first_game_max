@@ -1,3 +1,5 @@
+# server class sets up a two person connection once both players connect
+
 import socket
 from _thread import *
 from player import Player
@@ -7,14 +9,11 @@ import sys
 
 
 
-print("here!")
 server_ip = socket.gethostname()  
 port = 5551  
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print("after socket()")
 try:
-    print("before bind3")
     s.bind((server_ip, port))
     print("after bind()")
     s.listen(2)
